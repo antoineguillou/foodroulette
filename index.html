@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style type="text/css">
             body{ background-color: #eee; }
+            ul{ list-style: none; margin: 0; padding: 0; }
             .input-ctn{ position: relative; }
             .address{ width: 300px }
             .autocomplete{position: absolute; left: 0; top: 100%; background-color: #fff;}
@@ -44,7 +45,9 @@
                 getGeoloc();
 
                 var input = $('.address').get(0);
-                autocomplete = new google.maps.places.Autocomplete(input);
+                autocomplete = new google.maps.places.Autocomplete(input, {
+                  location: pos
+                });
                 autocomplete.addListener('place_changed', function() {
                     var input = $('.address').val();
                     getGeocode(input);
@@ -66,34 +69,41 @@
                 pos.lat = lat;
                 pos.lng = lng;
                 accuracy = acc;
-                $('.latlng').empty().append(pos.lat + ',' + pos.lng);
+                $('.latlng').empty().append(pos.lat + ',' + pos.lng + ' (accuracy :'+accuracy+')');
+
+                var options = {
+                    center: {
+                        lat: lat,
+                        lng: lng
+                    },
+                    radius: acc
+                };
+
+                var circle = new google.maps.Circle(options);
+                autocomplete.setBounds(circle.getBounds());
             }
 
             function getGeoloc(){
+                if ("geolocation" in navigator) {
+                  navigator.geolocation.getCurrentPosition(function(position) {
+                    updateLoc(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+                  });
+                } else {
+                  $.ajax({
+                      url: "https://www.googleapis.com/geolocation/v1/geolocate?key="+appKey,
+                      method: "POST",
 
-                $.ajax({
-                    url: "https://www.googleapis.com/geolocation/v1/geolocate?key="+appKey,
-                    method: "POST",
+                      success: function(data){
+                          //console.log(data);
 
-                    success: function(data){
-                        console.log(data);
+                          var lat = data.location.lat;
+                          var lng = data.location.lng;
+                          var acc = data.accuracy;
 
-                        var lat = data.location.lat;
-                        var lng = data.location.lng;
-                        var acc = data.accuracy;
-
-                        updateLoc(lat, lng, acc);
-
-                        var circle = new google.maps.Circle({
-                            center: {
-                                lat: lat,
-                                lng: lng
-                            },
-                            radius: acc
-                        });
-                        autocomplete.setBounds(circle.getBounds());
-                    }
-                });
+                          updateLoc(lat, lng, acc);
+                      }
+                  });
+                }
             }
             function getGeocode(input){
                 geocoder = new google.maps.Geocoder();
@@ -114,7 +124,7 @@
                     location: pos,
                     //radius: 1000,
                     //openNow: true,
-                    types: ['food', 'restaurant'],
+                    types: ['restaurant'],
                     rankBy : google.maps.places.RankBy.DISTANCE
                 }, function(results, status, pagination){
                     console.log(status, pagination, results);
@@ -122,7 +132,19 @@
                     $('.results ul').find('.moar').remove();
                     var list = '';
                     $(results).each(function(i,e){
-                        list += '<li data-id="'+e.place_id+'"><label><input type="checkbox" />'+e.name+'</label></li>';
+                        var isopen = "";
+                        if(e.opening_hours){
+                          isopen = " (fermé)";
+
+                          if(e.opening_hours.open_now){
+                            isopen = " (ouvert)";
+                          }
+                        }
+
+                        list += '<li data-id="'+e.place_id+'">'+
+                        '<label><input type="checkbox" value="'+e.place_id+'" />'+
+                        e.name+isopen+' <small>'+e.vicinity+'</small>'+
+                        '</label></li>';
                     });
                     if(pagination.hasNextPage)
                         list += '<li class="moar"><a href="#">moar</a></li>';
