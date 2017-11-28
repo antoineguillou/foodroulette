@@ -20,7 +20,7 @@
     </head>
 
     <body>
-        <span class="latlng"></span><br />
+        <span class="latlng"><button class="geo">Geoloc</button></span><br />
         <span class="input-ctn">
             <input type="text" placeholder="address" name="address" class="address" />
             <span class="autocomplete"></span>
@@ -42,7 +42,7 @@
             };
 
             function init(){
-                getGeoloc();
+                $('.geo').on('click', getGeoloc);
 
                 var input = $('.address').get(0);
                 autocomplete = new google.maps.places.Autocomplete(input, {
@@ -83,26 +83,32 @@
                 autocomplete.setBounds(circle.getBounds());
             }
 
+            function getGeolocFallback(){
+              $.ajax({
+                  url: "https://www.googleapis.com/geolocation/v1/geolocate?key="+appKey,
+                  method: "POST",
+
+                  success: function(data){
+                      //console.log(data);
+
+                      var lat = data.location.lat;
+                      var lng = data.location.lng;
+                      var acc = data.accuracy;
+
+                      updateLoc(lat, lng, acc);
+                  }
+              });
+            }
+
             function getGeoloc(){
                 if ("geolocation" in navigator) {
                   navigator.geolocation.getCurrentPosition(function(position) {
                     updateLoc(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+                  }, function(error){
+                    getGeolocFallback();
                   });
                 } else {
-                  $.ajax({
-                      url: "https://www.googleapis.com/geolocation/v1/geolocate?key="+appKey,
-                      method: "POST",
-
-                      success: function(data){
-                          //console.log(data);
-
-                          var lat = data.location.lat;
-                          var lng = data.location.lng;
-                          var acc = data.accuracy;
-
-                          updateLoc(lat, lng, acc);
-                      }
-                  });
+                  getGeolocFallback();
                 }
             }
             function getGeocode(input){
