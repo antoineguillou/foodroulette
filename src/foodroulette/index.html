@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>FoodRoulette</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="mask-icon" href="./safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#fefefe">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body>
+
+    <div class="container">
+      <p class="offlinemsg">You are offline</p>
+      <span class="latlng"></span>
+      <div class="input-ctn">
+          <input type="text" placeholder="Type your address" name="address" class="address" />
+          <button class="geo">Geoloc</button>
+          <div class="loader"></div>
+          <span class="autocomplete"></span>
+      </div>
+
+      <div class="actions">
+        <a href="#" class="btn disabled findfood">Foodroulette</a>
+        <!-- <a href="#" class="btn disabled random">Random</a> -->
+
+        <div class="legal">
+          <img src="img/powered_by_google_on_non_white_hdpi.png" width="144" height="18" alt="powered by Google" />
+        </div>
+      </div>
+
+      <div class="results"><ul></ul></div>
+
+    </div>
+
+    <div class="popin"></div>
+    <div id="map-canvas"></div>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="./js/script.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCG_SuyeaieZGpo9ZVCiCHZru8rseMPc8c&libraries=places&callback=init" async defer></script>
+
+    <!-- Help! I'm trapped in a website factory -->
+  </body>
+</html>

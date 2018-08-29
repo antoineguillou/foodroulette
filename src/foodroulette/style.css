@@ -1,0 +1,9 @@
+body{ background-color: #eee; }
+ul{ list-style: none; margin: 0; padding: 0; }
+.input-ctn{ position: relative; }
+.address{ width: 300px }
+.autocomplete{position: absolute; left: 0; top: 100%; background-color: #fff;}
+.autocomplete ul{list-style: none; margin: 0; padding: 0;}
+.autocomplete a{white-space: nowrap}
+.pac-container{ box-shadow: none; border: 1px solid #666; }
+.pac-container:after{ display: none; }
